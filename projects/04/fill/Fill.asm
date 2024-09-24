@@ -14,94 +14,83 @@
 // Put your code here.
 
 
-// Fill all screen with black
-// start = 8191
-// while start:
-//     SCREEN + start = -1
-//     start--
+// while true:
+    // if keyboard_value:
+    //      Fill all screen with black
+    //      start = 8191 (256 rows * 32 consecutive 16-bit words for column - 1 (zero index))
+    //      while start:
+    //          SCREEN + start = -1 // flip all 16 bit
+    //          start--
+    // else:
+    //      clear
 
-
-
-
-
-// //set i = 8191
-// @8191
-// D = A
-// @i
-// M = D
-
-
-
+// while true:
+//    fill_black = 0
+//    if keyboard_value:
+//        fill_value = -1
+//    
+//    while not start < 0:
+//           SCREEN + start = fill_value         
+//       start--
 
 (LOOP)
-    //set i = 8191
-    @8191
-    D = A
-    @i 
-    M = D
+    // fill_black = 0
+    @fill_black
+    M=0
 
-
-    // read keyboard value
-    @KBD 
-    D = M
-    @CLEAR
-    D;JEQ // goto clear if 0 (no input)
-    @FILL
+    //update fill_black if keyboard_value > 0
+    @KBD
+    D=M
+    @UPDATE_FILL_BLACK
     D;JGT
+    @START_FILL    
+    1;JMP
+
+    (UPDATE_FILL_BLACK)
+        @fill_black
+        M=-1
+        @START_FILL    
+        1;JMP
 
 
+    (START_FILL)
+    // set start to 8191
+        @8191
+        D=A
+        @start
+        M=D
 
-    //Clear
-    (CLEAR)
-    // set D to i
-    @i
-    D = M
-    //if D < 0: goto LOOP
-    @LOOP
-    D;JLT
-
-
-    //set SCREEN + start to 0
-    @SCREEN
-    A = A + D
-    M = 0
-
-
-    // i --
-    @i 
-    M = M - 1
-    
-    // goto clear
-    @CLEAR
-    0;JMP
-
-
-    // Fill
     (FILL)
-    // set D to i
-    @i
-    D = M
-    //if D < 0: goto LOOP
+        // Break loop if start < 0; goto LOOP
+        @start
+        D=M
+        @LOOP
+        D;JLT
+
+        // @temp contains screen + start
+        @SCREEN
+        D=A
+        @start
+        D=D+M
+        @temp
+        M=D
+
+        @fill_black
+        D=M
+
+        @temp
+        A=M
+        M=D        
+        
+        @start
+        M=M-1
+        @FILL
+        1;JMP
+
+
     @LOOP
-    D;JLT
-
-
-    //set SCREEN + start to -1
-    @SCREEN
-    A = A + D
-    M = -1
-
-
-    // i --
-    @i 
-    M = M - 1
-    
-    // goto fill
-    @FILL
-    0;JMP
-
-
-
+    1;JMP // Go to LOOP
+        
 // (END)
 //     @END
 //     0;JMP

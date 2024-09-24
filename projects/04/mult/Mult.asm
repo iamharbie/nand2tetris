@@ -18,38 +18,38 @@
 
 //set i -> R1
 @R1
-D = M
+D=M
 @i
-M = D
+M=D
 
 
 //Set R2 to 0 as initialization
 @R2
-M = 0
+M=0
 
 
 (LOOP)
-    // if i == 0, goto STOP
+    // if i <= 0, goto STOP
     @i
-    D = M
+    D=M
     @END
-    D; JEQ
+    D;JLE
 
 
     // R2 += R0
     @R0
-    D = M;
+    D=M
     @R2
-    M = M + D
+    M=D+M
 
     // i--
     @i 
-    M = M-1;
+    M=M-1
 
     // goto LOOP
     @LOOP
-    0;JMP
+    1;JMP
 
 (END)
     @END
-    0;JMP
+    1;JMP

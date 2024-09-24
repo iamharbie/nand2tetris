@@ -1,8 +1,7 @@
 // This file is part of www.nand2tetris.org
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
-// File name: projects/05/Memory.hdl
-
+// File name: projects/5/Memory.hdl
 /**
  * The complete address space of the Hack computer's memory,
  * including RAM and memory-mapped I/O. 
@@ -10,7 +9,7 @@
  *     Read:  out(t) = Memory[address(t)](t)
  *     Write: if load(t-1) then Memory[address(t-1)](t) = in(t-1)
  * In words: the chip always outputs the value stored at the memory 
- * location specified by address. If load==1, the in value is loaded 
+ * location specified by address. If load=1, the in value is loaded 
  * into the memory location specified by address. This value becomes 
  * available through the out output from the next time step onward.
  * Address space rules:
@@ -18,8 +17,17 @@
  * Access to address>0x6000 is invalid. Access to any address in 
  * the range 0x4000-0x5FFF results in accessing the screen memory 
  * map. Access to address 0x6000 results in accessing the keyboard 
- * memory map. The behavior in these addresses is described in the 
- * Screen and Keyboard chip specifications given in the book.
+ * memory map. The behavior in these addresses is described in the Screen
+ * and Keyboard chip specifications given in the lectures and the book.
+
+000000000000000 \
+                 - RAM
+011111111111111 / 
+100000000000000 \            0000000000000
+                 - Screen
+101111111111111 /            1111111111111 
+  1111111111111
+110000000000000 -> Keyboard
  */
 
 CHIP Memory {
@@ -27,5 +35,12 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    DMux4Way(in=load, sel=address[13..14], a=loadRAM1, b=loadRAM2, c=loadScreen, d=loadKeyboard);
+    
+    Or(a=loadRAM1, b=loadRAM2, out=loadRAM);
+    RAM16K(in=in, load=loadRAM, address=address[0..13], out=ramOutput);
+    Screen(in=in, load=loadScreen, address=address[0..12], out=screenOutput);
+    Keyboard(out=outKeyboard);
+
+    Mux4Way16(a=ramOutput, b=ramOutput, c=screenOutput, d=outKeyboard, sel=address[13..14], out=out);
 }
